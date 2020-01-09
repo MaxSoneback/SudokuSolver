@@ -7,13 +7,15 @@ def request_board(url, size, level):
         "size": size,
         "level": level
     }
-    r = requests.get(url=url, params=params)
-    data = r.json()
-
-    if data["response"]:
-        board = generate_board(data["squares"], size)
-        return board
-    return None
+    try:
+        r = requests.get(url=url, params=params, timeout=5)
+        data = r.json()
+        #  print(data)
+        if data["response"]:
+            board = generate_board(data["squares"], size)
+            return board
+    except requests.exceptions.ReadTimeout:
+        return None
 
 
 def generate_board(squares, size):

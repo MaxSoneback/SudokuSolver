@@ -1,4 +1,5 @@
 from board_requester import request_board
+from math import sqrt
 
 
 def solve(board):
@@ -27,16 +28,16 @@ def print_board(board):
     :return: None
     """
     for row_index, row in enumerate(board):
-        if row_index % 3 == 0 and row_index != 0:
-            print(" - - - - - - - - - - - - - - ")
+        if row_index % int(sqrt(len(board))) == 0 and row_index != 0:
+            print(' - ' * round(len(board)*1.1) + ' - ')
 
         for col_index, elem in enumerate(row):
-            if col_index % 3 == 0:
+            if col_index % int(sqrt(len(board))) == 0:
                 print(" | ", end="")
 
             print(f'{elem} ', end="")
 
-            if col_index == 8:
+            if col_index == len(board) - 1:
                 print("| ")
 
 
@@ -71,51 +72,55 @@ def assignment_is_valid(board, target, col, row):
             return False
 
     # Kolla element i boxen
-    box_x_coords, box_y_coords = calc_box_limits(col, row)
+    box_x_coords, box_y_coords = calc_box_limits(board, col, row)
 
     for x in box_x_coords:
         for y in box_y_coords:
             if x != col and y != row and board[y][x] == target:
                 return False
-        #print('\n \n')
-        #print_board(board)
     return True
 
 
-def calc_box_limits(col, row):
+def calc_box_limits(board, col, row):
     """
         :param col: Kolumnindex
         :param row: Radindex
         :return: Tuple med x respektive y-koordinater (startkolumn,slutkolumn+1),(startrad, slutrad+1)
         """
-    box_x = col // 3  # 0 = vänstra boxen, 1 = mellersta, 2 = högra
-    box_y = row // 3  # 0 = översta boxen, 1 = mellersta, 2 = nedersta
+    box_x = col // int(sqrt(len(board))) # 0 = vänstra boxen, 1 = mellersta, 2 = högra
+    box_y = row // int(sqrt(len(board)))  # 0 = översta boxen, 1 = mellersta, 2 = nedersta
 
-    box_x_start = box_x * 3  # Vänstra boxen startar på index = 0, mitten på index = 3, högra på index = 6
-    box_x_end = box_x_start + 3
+    box_x_start = box_x * int(sqrt(len(board)))  # Vänstra boxen startar på index = 0, mitten på index = 3, högra på index = 6
+    box_x_end = box_x_start + int(sqrt(len(board)))
 
-    box_y_start = box_y * 3  # Översta boxen startar på index = 0, mitten på index = 3, nedersta på index = 6
-    box_y_end = box_y_start + 3
+    box_y_start = box_y * int(sqrt(len(board)))  # Översta boxen startar på index = 0, mitten på index = 3, nedersta på index = 6
+    box_y_end = box_y_start + int(sqrt(len(board)))
 
     return range(box_x_start, box_x_end), range(box_y_start, box_y_end)
 
 
 url = 'http://www.cs.utep.edu/cheon/ws/sudoku/new/'
-size = 9
+size = 9  # Stöd för 4 & 9
 level = 3  # 1 = enkel, 2 = medel, 3 = svår
 
 start_board = request_board(url, size, level)
 
 if not start_board:
-    start_board = [[0, 0, 9, 7, 0, 0, 0, 0, 6],
-                   [0, 0, 7, 0, 9, 0, 0, 4, 2],
-                   [0, 2, 4, 6, 0, 3, 0, 0, 0],
-                   [0, 0, 0, 4, 0, 0, 9, 0, 0],
-                   [6, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [0, 0, 5, 0, 0, 8, 0, 0, 0],
-                   [0, 0, 0, 9, 0, 4, 2, 7, 0],
-                   [4, 5, 0, 0, 3, 0, 8, 0, 0],
-                   [7, 0, 0, 0, 0, 6, 3, 0, 0]]
+    if size == 9:
+        start_board = [[0, 0, 9, 7, 0, 0, 0, 0, 6],
+                       [0, 0, 7, 0, 9, 0, 0, 4, 2],
+                       [0, 2, 4, 6, 0, 3, 0, 0, 0],
+                       [0, 0, 0, 4, 0, 0, 9, 0, 0],
+                       [6, 0, 0, 0, 0, 0, 0, 0, 1],
+                       [0, 0, 5, 0, 0, 8, 0, 0, 0],
+                       [0, 0, 0, 9, 0, 4, 2, 7, 0],
+                       [4, 5, 0, 0, 3, 0, 8, 0, 0],
+                       [7, 0, 0, 0, 0, 6, 3, 0, 0]]
+    else:
+        start_board = [[4, 0, 0, 0],
+                       [0, 0, 4, 0],
+                       [0, 1, 0, 0],
+                       [2, 0, 0, 1]]
 
 print_board(start_board)
 solve(start_board)
